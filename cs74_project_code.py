@@ -144,7 +144,7 @@ val_idx   = train_val_idx[sub_val_idx]
 
 print(f"Spatial Split Sizes -> Train: {len(train_idx):,} ({len(train_idx)/len(meta_df)*100:.1f}%) | Val: {len(val_idx):,} ({len(val_idx)/len(meta_df)*100:.1f}%) | Test: {len(test_idx):,} ({len(test_idx)/len(meta_df)*100:.1f}%)")
 
-# Stratified subsampling helper for Train split so RBF-SVC fits in seconds while keeping rare classes
+# Stratified subsampling helper for Train split so RBF-SVC fits quickly while keeping rare classes
 def get_balanced_train_indices(indices, labels, max_per_class=1500, seed=42):
     rng = np.random.default_rng(seed)
     selected = []
@@ -227,7 +227,7 @@ for label_name, cutoff_m in TIME_BLOCKS.items():
     X_val,        y_val        = X[val_idx], y_all[val_idx]
     X_test,       y_test       = X[test_idx], y_all[test_idx]
     
-    # 2. Primary Traditional Model: RBF-SVC (quick validation tuning over C)
+    # 2. RBF-SVC (quick validation tuning over C)
     best_svc, best_val_f1, best_c = None, -1.0, 1.0
     for c_val in [1.0, 10.0]:
         candidate = make_pipeline(
@@ -266,7 +266,6 @@ for label_name, cutoff_m in TIME_BLOCKS.items():
         print(f"  {m_name:32s} | Test Macro-F1: {macro_f1:.4f} | Test Acc: {acc:.4f}")
 
 results_df = pd.DataFrame(results)
-print("\n=== SUMMARY TABLE FOR SLIDES ===")
 display(results_df)
 results_df.to_csv("/content/estonia_early_season_results.csv", index=False)
 
